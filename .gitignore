@@ -1,6 +1,10 @@
 .venv/
 .env
 __pycache__/
+<<<<<<< HEAD
 *.pycextracted.txt
 extracted.txt
 test.pdf
+=======
+
+>>>>>>> 80877ec0feefc83d10d14287fbab3b156eea7bf8
