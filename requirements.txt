@@ -1,3 +1,6 @@
-openai==1.55.3
+openai>=1.55.3
 pypdf==4.0.1
 python-dotenv==1.0.0
+markdown>=3.5
+markdown-pdf>=1.1
+streamlit>=1.30
