@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import os
 import json
 from openai import OpenAI
@@ -13,10 +13,10 @@ client = OpenAI(
 )
 
 MODEL = "openai/gpt-oss-20b"
-=======
+
 from pypdf import PdfReader
 
->>>>>>> 80877ec0feefc83d10d14287fbab3b156eea7bf8
+
 
 def extract_text_from_pdf(file_path: str) -> str:
     """Read every page of a PDF and join the text."""
@@ -38,7 +38,7 @@ def load_document(file_path: str) -> str:
     """Pick the right extractor based on file extension."""
     if file_path.lower().endswith(".pdf"):
         return extract_text_from_pdf(file_path)
-<<<<<<< HEAD
+
     return extract_text_from_txt(file_path)
 
 def chunk_text(text: str, max_chars: int = 6000) -> list[str]:
@@ -108,6 +108,29 @@ def generate_summary(text: str) -> str:
         "summary with a title, overview, and key bullet points.",
         "\n\n".join(partials),
     )
-=======
+
     return extract_text_from_txt(file_path)
->>>>>>> 80877ec0feefc83d10d14287fbab3b156eea7bf8
+
+import markdown
+from markdown_pdf import MarkdownPdf, Section
+
+
+def save_summary(text: str, output_file: str = "summary.md") -> str:
+    """Generate a summary and save it as markdown. Returns the summary text."""
+    summary = generate_summary(text)
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write(summary)
+    return summary
+
+
+def md_to_pdf(md_file: str = "summary.md", pdf_file: str = "summary.pdf") -> None:
+    """Convert a markdown file to PDF using the installed libraries."""
+    with open(md_file, "r", encoding="utf-8") as f:
+        md_text = f.read()
+
+    html = markdown.markdown(md_text, extensions=["tables", "fenced_code"])
+
+    pdf = MarkdownPdf(toc_level=2)
+    pdf.add_section(Section(html))
+    pdf.save(pdf_file)
+    print(f"Wrote {pdf_file}")

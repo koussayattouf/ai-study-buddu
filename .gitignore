@@ -5,6 +5,9 @@ __pycache__/
 *.pycextracted.txt
 extracted.txt
 test.pdf
+*.pdf
+summary.md
+
 =======
 
 >>>>>>> 80877ec0feefc83d10d14287fbab3b156eea7bf8
