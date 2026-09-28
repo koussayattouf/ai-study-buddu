@@ -1,3 +1,4 @@
+from study_buddy import load_document, generate_summary, summary_to_pdf_bytes
 import os
 import tempfile
 from contextlib import suppress
@@ -50,9 +51,28 @@ if uploaded is not None:
         st.subheader("Summary")
         st.markdown(st.session_state.summary)
 
-        st.download_button(
-            label="⬇️ Download as Markdown",
-            data=st.session_state.summary,
-            file_name=f"{os.path.splitext(uploaded.name)[0]}_summary.md",
-            mime="text/markdown",
-        )
+        stem = os.path.splitext(uploaded.name)[0]
+
+        col_md, col_pdf = st.columns(2)
+
+        with col_md:
+            st.download_button(
+                label="⬇️ Download as Markdown",
+                data=st.session_state.summary,
+                file_name=f"{stem}_summary.md",
+                mime="text/markdown",
+                use_container_width=True,
+            )
+
+        with col_pdf:
+            # Generate PDF bytes on demand
+            with st.spinner("Preparing PDF..."):
+                pdf_bytes = summary_to_pdf_bytes(st.session_state.summary)
+
+            st.download_button(
+                label="⬇️ Download as PDF",
+                data=pdf_bytes,
+                file_name=f"{stem}_summary.pdf",
+                mime="application/pdf",
+                use_container_width=True,
+            )

@@ -134,3 +134,30 @@ def md_to_pdf(md_file: str = "summary.md", pdf_file: str = "summary.pdf") -> Non
     pdf.add_section(Section(html))
     pdf.save(pdf_file)
     print(f"Wrote {pdf_file}")
+def summary_to_pdf_bytes(summary_md: str) -> bytes:
+    """Convert a summary markdown string to PDF bytes (no temp files left behind)."""
+    import tempfile
+    import os
+    from contextlib import suppress
+    import markdown
+    from markdown_pdf import MarkdownPdf, Section
+
+    # Convert markdown to HTML
+    html = markdown.markdown(summary_md, extensions=["tables", "fenced_code"])
+
+    # Use a temp file for the PDF output
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        pdf_path = tmp.name
+
+    try:
+        pdf = MarkdownPdf(toc_level=2)
+        pdf.add_section(Section(html))
+        pdf.save(pdf_path)
+
+        with open(pdf_path, "rb") as f:
+            pdf_bytes = f.read()
+    finally:
+        with suppress(OSError):
+            os.unlink(pdf_path)
+
+    return pdf_bytes
