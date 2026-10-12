@@ -9,6 +9,7 @@ from study_buddy import (
     generate_summary,
     summary_to_pdf_bytes,
     generate_quiz,
+    generate_flashcards,
 )
 
 st.set_page_config(page_title="AI Study Buddy", page_icon="📚", layout="wide")
@@ -55,7 +56,7 @@ st.divider()
 # Tabs: Summary and Quiz
 # ============================================================
 
-tab_summary, tab_quiz = st.tabs(["📝 Summary", "❓ Quiz"])
+tab_summary, tab_quiz, tab_cards = st.tabs(["📝 Summary", "❓ Quiz", "🃏 Flashcards"])
 
 # ---- Summary Tab ----
 with tab_summary:
@@ -123,3 +124,23 @@ with tab_quiz:
                     )
 
             st.divider()
+# ---- Flashcards Tab ----
+with tab_cards:
+    num_cards = st.slider(
+        "Number of flashcards",
+        min_value=5,
+        max_value=30,
+        value=10,
+    )
+
+    if st.button("🃏 Generate Flashcards", type="primary"):
+        with st.spinner(f"Creating {num_cards} flashcards..."):
+            st.session_state.cards = generate_flashcards(text, num_cards)
+
+    if "cards" in st.session_state:
+        st.subheader(f"Flashcards ({len(st.session_state.cards)} cards)")
+        st.caption("Click a card to reveal the answer.")
+
+        for i, card in enumerate(st.session_state.cards, 1):
+            with st.expander(f"Card {i} — {card['front']}"):
+                st.markdown(f"**{card['back']}**")

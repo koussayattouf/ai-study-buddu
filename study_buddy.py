@@ -205,3 +205,39 @@ Text:
 
     raw = _call_llm(system_prompt, user_prompt, json_mode=True)
     return _safe_json(raw).get("questions", [])
+def generate_flashcards(text: str, num_cards: int = 10) -> list[dict]:
+    system_prompt = (
+        "You are a flashcard generator. "
+        "You ONLY output valid JSON. "
+        "No prose, no markdown, no code fences — just a JSON object."
+    )
+
+    user_prompt = f"""Generate exactly {num_cards} flashcards based on the text below.
+
+Use a mix of card styles:
+- Some cards should be term → definition (e.g., "Evaporation" → "The process by which...")
+- Some cards should be question → answer (e.g., "What drives evaporation?" → "Solar energy.")
+
+Respond with a single JSON object matching this exact structure:
+{{
+  "flashcards": [
+    {{
+      "front": "the term or question",
+      "back": "the definition or answer"
+    }}
+  ]
+}}
+
+Rules:
+- Exactly {num_cards} flashcards.
+- "front" is short — a term or a single question.
+- "back" is concise — under 30 words.
+- Mix the two styles — don't use only terms or only questions.
+- Respond with JSON only.
+
+Text:
+{text[:6000]}
+"""
+
+    raw = _call_llm(system_prompt, user_prompt, json_mode=True)
+    return _safe_json(raw).get("flashcards", [])
