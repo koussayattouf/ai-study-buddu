@@ -172,24 +172,36 @@ def _safe_json(raw: str) -> dict:
 
 
 def generate_quiz(text: str, num_questions: int = 5) -> list[dict]:
-    prompt = f"""Create {num_questions} multiple-choice questions from the text below.
-Return ONLY valid JSON with this exact schema:
+    system_prompt = (
+        "You are a quiz generator. "
+        "You ONLY output valid JSON. "
+        "No prose, no markdown, no code fences — just a JSON object."
+    )
+
+    user_prompt = f"""Generate exactly {num_questions} multiple-choice questions based on the text below.
+
+Respond with a single JSON object matching this exact structure:
 {{
   "questions": [
     {{
-      "question": "...",
-      "options": ["A) ...", "B) ...", "C) ...", "D) ..."],
+      "question": "string",
+      "options": ["A) string", "B) string", "C) string", "D) string"],
       "answer": "A",
-      "explanation": "why the answer is correct"
+      "explanation": "one short sentence"
     }}
   ]
 }}
+
+Rules:
+- Exactly {num_questions} questions.
+- Exactly 4 options per question, each prefixed with "A) ", "B) ", "C) ", "D) ".
+- "answer" is a single letter: A, B, C, or D.
+- "explanation" is under 20 words.
+- Respond with JSON only.
+
 Text:
-{text[:12000]}
+{text[:6000]}
 """
-    raw = _call_llm(
-        "You are a quiz generator. Only return valid JSON.",
-        prompt,
-        json_mode=True,
-    )
+
+    raw = _call_llm(system_prompt, user_prompt, json_mode=True)
     return _safe_json(raw).get("questions", [])
