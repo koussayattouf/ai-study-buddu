@@ -5,11 +5,22 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from pypdf import PdfReader
 
+import streamlit as st
+
 load_dotenv()
+
+
+def _get_groq_key():
+    """Read the Groq API key from Streamlit secrets (cloud) or .env (local)."""
+    try:
+        return st.secrets["GROQ_API_KEY"]
+    except (KeyError, FileNotFoundError):
+        return os.getenv("GROQ_API_KEY")
+
 
 client = OpenAI(
     base_url="https://api.groq.com/openai/v1",
-    api_key=os.getenv("GROQ_API_KEY"),
+    api_key=_get_groq_key(),
 )
 
 MODEL = "openai/gpt-oss-20b"
