@@ -161,3 +161,35 @@ def summary_to_pdf_bytes(summary_md: str) -> bytes:
             os.unlink(pdf_path)
 
     return pdf_bytes
+def _safe_json(raw: str) -> dict:
+    """Parse JSON that may be wrapped in markdown fences."""
+    raw = raw.strip()
+    if raw.startswith("```"):
+        raw = raw.strip("`")
+        if raw.lower().startswith("json"):
+            raw = raw[4:]
+    return json.loads(raw.strip())
+
+
+def generate_quiz(text: str, num_questions: int = 5) -> list[dict]:
+    prompt = f"""Create {num_questions} multiple-choice questions from the text below.
+Return ONLY valid JSON with this exact schema:
+{{
+  "questions": [
+    {{
+      "question": "...",
+      "options": ["A) ...", "B) ...", "C) ...", "D) ..."],
+      "answer": "A",
+      "explanation": "why the answer is correct"
+    }}
+  ]
+}}
+Text:
+{text[:12000]}
+"""
+    raw = _call_llm(
+        "You are a quiz generator. Only return valid JSON.",
+        prompt,
+        json_mode=True,
+    )
+    return _safe_json(raw).get("questions", [])
